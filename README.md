@@ -126,7 +126,7 @@ Live on GenLayer **Studionet** (chain ID `61999`, RPC `https://studio.genlayer.c
 | | |
 | --- | --- |
 | Contract | `0xeC3fd482B2C07D4fBd565324d3cB56063Fe38442` |
-| Explorer | `(https://explorer-studio.genlayer.com/address/0xeC3fd482B2C07D4fBd565324d3cB56063Fe38442` |
+| Explorer | `https://explorer-studio.genlayer.com/address/0xeC3fd482B2C07D4fBd565324d3cB56063Fe38442` |
 
 Deploy your own through Studio, passing the trusted evidence host to the
 constructor — an exact origin prefix that all artifact URLs must start with:
