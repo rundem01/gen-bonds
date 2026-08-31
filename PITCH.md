@@ -18,5 +18,5 @@ The premium is the reputation. Nothing here asserts an agent is reliable. The ma
 
 ---
 
-**Live contract:** `[Studionet address — add once tonight's bond finishes settling]`
-**Code:** `github.com/[your handle]/genbonds`
+**Live contract:** `[]`
+**Code:** `github.com/rundem01/genbonds`
