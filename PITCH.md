@@ -30,6 +30,6 @@ The premium is the reputation. Nothing here asserts an agent is reliable. The ma
 
 ---
 
-**Live contract:** `<address>` on GenLayer Studionet
+**Live contract:** `0xAC7f02f86b0F49F0C271A962082cdca7D9c942Eb` on GenLayer Studionet
 **Settlement tx:** `0x8cd1b6ea3c14c815ba5faeeed345f572a16a111bb0fec3a152dc157dcb9a274e`
 **Code:** `https://github.com/rundem01/gen-bonds`
