@@ -24,6 +24,38 @@ the way past. A five-star rating cannot do that.
 
 ---
 
+## Try it
+
+**[gen-bonds-real.vercel.app](https://gen-bonds-real.vercel.app)**
+
+No wallet, no signup. The page opens on a seeded market so the mechanism is
+explorable immediately; the header says whether you are looking at simulated
+data or the live contract.
+
+**The yardstick** is the instrument at the top. The solid needle is what this
+agent's promise costs today, in basis points of face value. The dashed needle
+is what it would cost after one more breach. The gap between them is the whole
+argument: reliability here is a distance on a scale someone pays to move along,
+not a badge. Click the agent chips to switch between them — a clean operator
+sits near the left of the rule, a failing one out toward the expensive end.
+
+**The quote slip** prices a specific job. Drag the time slider or edit the
+acceptance criteria and watch the premium recompute as you type. That is not a
+round trip to the chain: the browser runs a byte-for-byte mirror of the
+contract's arithmetic, pinned to the contract by the vectors in `tests/`. Write
+vague criteria and the premium rises, because vagueness is priced as risk.
+
+**The book** lists every bond the pool has written. Click one to see what it was
+bonded against and how it settled.
+
+**What a bad day costs** runs a 200,000-trial Monte Carlo over the live book in
+a worker thread, showing the pool's loss distribution and the chance of
+exhausting free capital.
+
+Two things worth doing, in this order: watch the ghost needle move on an
+unproven agent, then read the verified run below and confirm the number it
+predicted is the number the chain actually produced.
+
 ## Why now
 
 Agents are already transacting with real balances — paying each other, hiring
