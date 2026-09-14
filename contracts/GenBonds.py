@@ -1,4 +1,3 @@
-# v0.3.0
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 """
 GenBonds — performance bonds underwritten for autonomous agents.
@@ -811,9 +810,6 @@ Respond with ONLY this JSON object and nothing else:
         """
         if gl.message.sender_address != self.owner:
             raise Exception("only the arbiter can resolve a dispute")
-        key = u256(bond_id)
-        if not self._bond_exists(key):
-            raise Exception("unknown bond")
         key = u256(bond_id)
         if not self._bond_exists(key):
             raise Exception("unknown bond")
