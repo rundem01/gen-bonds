@@ -18,6 +18,34 @@ import type {
   PoolView,
 } from "./types.ts";
 
+const ACCEPTED_STATUSES = new Set(["ACCEPTED", "FINALIZED"]);
+
+/**
+ * v0.6 success test. Status and execution result must BOTH be right:
+ * a reverted transaction reaches FINALIZED just like a successful one.
+ */
+function isSuccessful(receipt: any): boolean {
+  if (typeof receipt?.isSuccessful === "boolean") return receipt.isSuccessful;
+  const status = String(receipt?.status ?? "").toUpperCase();
+  const execution = String(
+    receipt?.executionResult ?? receipt?.execution_result ?? "",
+  ).toUpperCase();
+  if (!ACCEPTED_STATUSES.has(status)) return false;
+  // Older nodes omit the execution result; treat its absence as inconclusive
+  // rather than as failure, so this keeps working against stable Studionet.
+  return execution === "" || execution === "FINISHED_WITH_RETURN";
+}
+
+function describeFailure(receipt: any, functionName: string): string {
+  const status = receipt?.status ?? "unknown status";
+  const execution =
+    receipt?.executionResult ?? receipt?.execution_result ?? "no execution result";
+  const reason = receipt?.result?.error ?? receipt?.error ?? "";
+  return `${functionName} finalized but did not succeed (${status} / ${execution})${
+    reason ? `: ${reason}` : ""
+  }`;
+}
+
 const STATES: BondState[] = ["bound", "bound", "honored", "breached", "disputed", "cancelled"];
 
 interface CacheEntry {
@@ -85,7 +113,14 @@ export class LiveBackend implements Backend {
       import("genlayer-js"),
       import("genlayer-js/chains"),
     ]);
-    const chain = (chains as any).studionet ?? (chains as any).localnet;
+    // Consensus v0.6 runs on Studio-dev / Studio Next, chain 61997 — a
+    // different chain identity from stable Studionet (61999). The docs are
+    // explicit that chain identity and consensus contract addresses move
+    // together, so never point the studionet object at the preview RPC.
+    const c = chains as Record<string, unknown>;
+    const chain =
+      c.studioDevnet ?? c.studioNext ?? c.studionet ?? c.localnet;
+    if (!chain) throw new Error("No GenLayer chain definition found in genlayer-js/chains");
     const client = createClient({
       chain,
       endpoint: config.studioUrl,
@@ -124,18 +159,62 @@ export class LiveBackend implements Backend {
   }
 
   async #write(functionName: string, args: unknown[], value = 0n): Promise<any> {
+    // v0.6 is fee-funded: every deploy and write carries a FeesDistribution
+    // and its quoted fee value. A Studio deployment can still be gasless, and
+    // the docs say to detect that from the estimate result rather than from
+    // the network's name — so ask, and only attach fees if the estimate
+    // returns any.
+    const fees = await this.#estimateFees(functionName, args);
+
     const hash = await this.#client.writeContract({
       address: this.#address,
       functionName,
       args,
       value,
+      ...(fees ? { fees } : {}),
     });
     const receipt = await this.#client.waitForTransactionReceipt({
       hash,
       status: "FINALIZED",
     });
     this.#cache.invalidate();
+
+    // v0.6: an accepted or finalized status does not by itself prove the
+    // contract executed successfully. A reverted transaction still finalizes.
+    // Success requires BOTH an accepted/finalized status and an execution
+    // result of FINISHED_WITH_RETURN.
+    if (!isSuccessful(receipt)) {
+      throw new Error(describeFailure(receipt, functionName));
+    }
     return receipt;
+  }
+
+  /**
+   * Ask the SDK what this write costs. Returns undefined on a gasless
+   * deployment, or when the SDK predates fee estimation — in both cases the
+   * write proceeds without a fee attachment.
+   */
+  async #estimateFees(functionName: string, args: unknown[]): Promise<unknown> {
+    const estimate = this.#client.estimateTransactionFees;
+    if (typeof estimate !== "function") return undefined;
+    try {
+      const result = await estimate.call(this.#client, {
+        address: this.#address,
+        functionName,
+        args,
+      });
+      if (!result?.distribution) return undefined;
+      return {
+        distribution: result.distribution,
+        feeValue: result.feeValue,
+        ...(result.messageAllocations
+          ? { messageAllocations: result.messageAllocations }
+          : {}),
+      };
+    } catch {
+      // Gasless Studio deployments reject or no-op the estimate. Not fatal.
+      return undefined;
+    }
   }
 
   async version(): Promise<string> {

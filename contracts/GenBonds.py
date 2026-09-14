@@ -813,9 +813,6 @@ Respond with ONLY this JSON object and nothing else:
         key = u256(bond_id)
         if not self._bond_exists(key):
             raise Exception("unknown bond")
-        key = u256(bond_id)
-        if not self._bond_exists(key):
-            raise Exception("unknown bond")
         if int(self.bond_state[key]) != DISPUTED:
             raise Exception("bond is not disputed")
         return self._resolve(key, HONORED if honored else BREACHED, note[:160])
