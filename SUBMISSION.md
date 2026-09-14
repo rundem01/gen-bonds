@@ -6,9 +6,8 @@ Everything the GenBonds hackathon entry needs, and what is left to fill in.
 
 - [ ] Replace `<address>` in `README.md` (the **Deployed** table, two places)
       with your Studionet contract address.
-- [ ] Replace `[your handle]` in `PITCH.md` with your GitHub username.
-- [ ] Replace `[Studionet address — add once tonight's bond finishes settling]`
-      in `PITCH.md` with the same address.
+- [ ] Replace `<your handle>` in `PITCH.md` with your GitHub username.
+- [ ] Replace `<address>` in `PITCH.md` with the same contract address.
 
 ## Push
 
@@ -32,9 +31,13 @@ places and never to set a price: task difficulty at bind, delivery adjudication
 at settle, and clock agreement. Everything else is integer arithmetic on stored
 state, so a hallucinating validator cannot invent a premium.
 
-**The evidence** — a live Studionet deployment with a real multi-validator
-consensus round, verifiable on the public explorer without trusting a
-screenshot.
+**The evidence** — a live Studionet deployment with the full lifecycle executed
+end to end: fund, bind, deliver, adjudicate, settle, reprice. A validator
+fetched a real file from a public URL, judged it against criteria written in
+English, and breached the bond, citing the specific missing field. The agent's
+price moved 1050 -> 1340 bps in one transaction. Settlement tx
+`0x8cd1b6ea3c14c815ba5faeeed345f572a16a111bb0fec3a152dc157dcb9a274e`,
+verifiable on the public explorer without trusting a screenshot.
 
 **The engineering** — 21 actuarial tests, 50 cross-language pricing vectors
 pinning the TypeScript mirror to the contract byte for byte, a ten-trap deploy
@@ -42,10 +45,19 @@ gate, and a probe ladder that isolates GenVM failures.
 
 ## Strongest thing to lead with
 
-The reprice. A spotless agent prices at 2.80% of face; one breach moves it to
-3.57%. That is 77 basis points of real cost on every bond that agent writes
-afterwards — and the market did not rate the agent, it repriced it, because
-money moved.
+The verdict, then the reprice. A validator read
+`{"summary": "Report complete."}`, compared it to criteria written in plain
+English, and returned `{"verdict":"breached","note":"JSON lacks required data
+field"}`. That is a machine adjudicating a contract by reading the work — the
+thing a deterministic VM cannot do at any price.
+
+Then the consequence: 1050 -> 1340 bps, 290 basis points of face value on every
+bond that agent writes afterwards, plus 0.6 GEN of its own capital gone. The
+market did not rate the agent. It repriced it, because money moved.
+
+Screenshots worth having ready: the settle transaction modal (verdict,
+equivalence principle output, validator set) and the two `price_of_trust`
+responses side by side.
 
 ## Known gaps, stated rather than hidden
 
