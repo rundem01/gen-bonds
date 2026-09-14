@@ -79,7 +79,7 @@ export function simulate(request: RiskRequest): RiskResult {
   const histogram = new Float64Array(BINS);
   for (let t = 0; t < trials; t += 1) {
     const bin = Math.min(BINS - 1, Math.floor(losses[t]! / binWidth));
-    histogram[bin] += 1;
+    histogram[bin] = (histogram[bin] ?? 0) + 1;
   }
   let histogramMax = 0;
   for (let b = 0; b < BINS; b += 1) if (histogram[b]! > histogramMax) histogramMax = histogram[b]!;

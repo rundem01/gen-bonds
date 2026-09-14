@@ -16,5 +16,5 @@
     "verbatimModuleSyntax": true,
     "types": ["vite/client"]
   },
-  "include": ["src", "tests/parity.test.ts", "vite.config.ts"]
+  "include": ["src", "vite.config.ts"]
 }

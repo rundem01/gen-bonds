@@ -91,11 +91,12 @@ export class LiveBackend implements Backend {
       endpoint: config.studioUrl,
       account: createAccount(),
     });
-    const [account] = await client.getConnectedAccounts?.() ?? [];
+    // The account comes from the client we just built with createAccount();
+    // the SDK has no separate connected-accounts lookup.
     const backend = new LiveBackend(
       client,
       config.contractAddress,
-      account ?? client.account?.address ?? "",
+      (client as { account?: { address?: string } }).account?.address ?? "",
     );
 
     // Confirm the deployed instance is the source this frontend was built

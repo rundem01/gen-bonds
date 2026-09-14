@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pricing:
+    name: actuarial core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Studio builds the schema by executing the module, so a load-time
+      # hazard shows up as "Could not load contract schema" with no traceback.
+      # Catch it here instead.
+      - name: Contract will load in GenVM
+        run: python3 scripts/check_contract.py
+
+      - name: Contract pricing tests
+        run: python3 tests/test_pricing.py
+
+      - name: TypeScript mirror matches the contract
+        run: node --experimental-strip-types tests/parity.test.ts
+
+      # The vectors are generated from the contract. If regenerating them
+      # changes the file, the mirror and the contract have drifted apart and
+      # the committed vectors are stale.
+      - name: Vectors are current
+        run: |
+          python3 scripts/generate_vectors.py
+          git diff --exit-code tests/vectors.json
+
+  frontend:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
