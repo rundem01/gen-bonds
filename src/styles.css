@@ -782,3 +782,45 @@ input[type="range"] {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ------------------------------------------------------------- wallet */
+
+.masthead__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+}
+
+.wallet {
+  font-family: var(--figures);
+  font-size: 11px;
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
+  padding: 5px 11px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.wallet:hover:not(:disabled) {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.wallet:disabled {
+  cursor: not-allowed;
+  color: var(--ink-faint);
+}
+
+.wallet[data-tone="ok"] {
+  border-color: var(--bind);
+  color: var(--bind);
+}
+
+.wallet[data-tone="warn"] {
+  border-color: var(--amber);
+  color: var(--amber);
+}

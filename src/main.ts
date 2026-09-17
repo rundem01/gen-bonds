@@ -13,6 +13,7 @@
  */
 
 import { estimateDifficulty } from "./core/difficulty.ts";
+import { Wallet } from "./core/wallet.ts";
 import { addr, eth, hours as fmtHours, pct, toWei } from "./core/format.ts";
 import { afterSettlement, quote, PREMIUM_CAP_BPS } from "./core/pricing.ts";
 import { SimulatedBackend } from "./core/simulator.ts";
@@ -41,19 +42,27 @@ const DEFAULT_CRITERIA =
 
 async function boot(): Promise<void> {
   const contractAddress = import.meta.env?.VITE_CONTRACT_ADDRESS as string | undefined;
+  const wallet = new Wallet();
+  await wallet.restore();
+
   let backend: Backend = new SimulatedBackend();
 
-  if (contractAddress) {
+  const connectBackend = async (): Promise<Backend> => {
+    if (!contractAddress) return new SimulatedBackend();
     try {
       const { LiveBackend } = await import("./core/live.ts");
-      backend = await LiveBackend.connect({
+      return await LiveBackend.connect({
         contractAddress,
         studioUrl: import.meta.env?.VITE_STUDIO_URL as string | undefined,
+        account: wallet.state.address,
       });
     } catch (error) {
       console.warn("Falling back to the simulated market:", error);
+      return new SimulatedBackend();
     }
-  }
+  };
+
+  backend = await connectBackend();
 
   const store = new Store<AppState>({
     backend,
@@ -69,8 +78,20 @@ async function boot(): Promise<void> {
     busy: false,
   });
 
-  mount(store);
+  mount(store, wallet);
   await refresh(store);
+
+  // Reconnect the backend whenever the account changes, so writes are always
+  // signed by whoever the wallet currently says they are.
+  let lastAccount = wallet.state.address;
+  wallet.subscribe((state) => {
+    if (state.address === lastAccount) return;
+    lastAccount = state.address;
+    void connectBackend().then(async (next) => {
+      store.set({ backend: next });
+      await refresh(store);
+    });
+  });
 }
 
 async function refresh(store: Store<AppState>): Promise<void> {
@@ -125,12 +146,43 @@ function runRiskModel(store: Store<AppState>): void {
 
 // --------------------------------------------------------------------- views
 
-function mount(store: Store<AppState>): void {
+function mount(store: Store<AppState>, wallet: Wallet): void {
   const app = document.querySelector<HTMLElement>("#app")!;
   app.innerHTML = template();
 
   const yardstick = new Yardstick(app.querySelector("[data-yardstick]")!);
   const book = new BookView(app.querySelector("[data-book]")!, (bond) => openBond(store, bond));
+
+  const walletButton = app.querySelector<HTMLButtonElement>("[data-wallet]")!;
+  walletButton.addEventListener("click", async () => {
+    const { address, chainOk } = wallet.state;
+    try {
+      if (!address) await wallet.connect();
+      else if (!chainOk) await wallet.switchChain();
+      else wallet.disconnect();
+    } catch (error) {
+      store.set({ notice: { tone: "bad", text: (error as Error).message } });
+    }
+  });
+
+  wallet.subscribe((state) => {
+    if (!state.available) {
+      walletButton.textContent = "no wallet detected";
+      walletButton.disabled = true;
+      walletButton.dataset.tone = "idle";
+      return;
+    }
+    if (!state.address) {
+      walletButton.textContent = "connect wallet";
+      walletButton.dataset.tone = "idle";
+    } else if (!state.chainOk) {
+      walletButton.textContent = "switch to studio next";
+      walletButton.dataset.tone = "warn";
+    } else {
+      walletButton.textContent = addr(state.address);
+      walletButton.dataset.tone = "ok";
+    }
+  });
 
   const modeTag = app.querySelector<HTMLElement>("[data-mode]")!;
   modeTag.textContent = store.state.backend.mode === "live" ? "live contract" : "simulated market";
@@ -443,7 +495,10 @@ function template(): string {
       <span class="wordmark__rule" aria-hidden="true"></span>
       <span class="tagline">the market prices an agent's promise</span>
     </div>
-    <span class="mode" data-mode></span>
+    <div class="masthead__actions">
+      <span class="mode" data-mode></span>
+      <button class="wallet" type="button" data-wallet>connect wallet</button>
+    </div>
   </header>
 
   <p class="notice" data-notice hidden></p>

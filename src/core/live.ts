@@ -91,6 +91,12 @@ class ReadCache {
 export interface LiveConfig {
   contractAddress: string;
   studioUrl?: string;
+  /**
+   * The connected wallet address. When present the client signs as that
+   * account, so writes come from the visitor rather than from a throwaway
+   * key the page invented. Reads work either way.
+   */
+  account?: string | null;
 }
 
 export class LiveBackend implements Backend {
@@ -121,17 +127,21 @@ export class LiveBackend implements Backend {
     const chain =
       c.studioDevnet ?? c.studioNext ?? c.studionet ?? c.localnet;
     if (!chain) throw new Error("No GenLayer chain definition found in genlayer-js/chains");
+    // A connected wallet signs as itself; without one, fall back to a
+    // generated account so the app still reads the chain and renders.
     const client = createClient({
       chain,
       endpoint: config.studioUrl,
-      account: createAccount(),
+      account: config.account ?? createAccount(),
     });
     // The account comes from the client we just built with createAccount();
     // the SDK has no separate connected-accounts lookup.
     const backend = new LiveBackend(
       client,
       config.contractAddress,
-      (client as { account?: { address?: string } }).account?.address ?? "",
+      config.account ??
+        (client as { account?: { address?: string } }).account?.address ??
+        "",
     );
 
     // Confirm the deployed instance is the source this frontend was built

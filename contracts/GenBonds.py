@@ -1,4 +1,5 @@
-# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
+# v0.3.0
+# { "Depends": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng" }
 """
 GenBonds — performance bonds underwritten for autonomous agents.
 
@@ -38,7 +39,9 @@ inside the non-deterministic block that uses it, which is the only place a
 clock is allowed to exist.
 """
 
-from genlayer import *
+import genlayer as gl
+from genlayer.types import *
+from genlayer.storage import TreeMap
 
 import json
 
@@ -182,7 +185,7 @@ def strip_fences(raw: str) -> str:
 # --------------------------------------------------------------------------
 
 
-class GenBonds(gl.Contract):
+class GenBonds(gl.contract.Contract):
     # ---- storage -------------------------------------------------------
     owner: Address
     trusted_evidence_host: str
@@ -264,10 +267,11 @@ class GenBonds(gl.Contract):
             raise Exception("insufficient balance")
         self.ledger[account] = u256(balance - amount)
 
-    def _agent_field(self, field, agent: Address) -> int:
+    def _agent_field(self, field: TreeMap[Address, u256], agent: Address) -> int:
         """Read one agent field without indexing a missing TreeMap entry."""
-        value = field.get(agent)
-        return 0 if value is None else int(value)
+        if agent in field:
+            return int(field[agent])
+        return 0
 
     def _bond_exists(self, key: u256) -> bool:
         return key in self.bond_state
@@ -570,7 +574,7 @@ class GenBonds(gl.Contract):
             self._agent_field(self.agent_live_exposure, obligor) + pool_exposure
         )
 
-        return u256(bond_id)
+        return bond_id
 
     def _assess_difficulty(self, criteria: str, duration_hours: int) -> int:
         """
