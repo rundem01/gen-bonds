@@ -608,7 +608,7 @@ Respond with ONLY this JSON object and nothing else:
 
         raw = gl.eq_principle.prompt_comparative(
             assess,
-            principle=(
+            (
                 "Both outputs must be valid JSON with the same keys. The "
                 f"'risk_mult' values must differ by no more than {RISK_MULT_STEP}. "
                 "Compare the raw numbers directly — do not round them first, "
@@ -739,7 +739,7 @@ Respond with ONLY this JSON object and nothing else:
 
         raw = gl.eq_principle.prompt_comparative(
             judge,
-            principle=(
+            (
                 "Both outputs must be valid JSON with keys verdict, note and "
                 "observed_at. The 'verdict' values must be identical. The "
                 "'note' fields must cite the same deciding criterion, though "
