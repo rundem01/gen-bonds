@@ -123,16 +123,24 @@ export class LiveBackend implements Backend {
     // different chain identity from stable Studionet (61999). The docs are
     // explicit that chain identity and consensus contract addresses move
     // together, so never point the studionet object at the preview RPC.
-    const c = chains as Record<string, unknown>;
-    const chain =
-      c.studioDevnet ?? c.studioNext ?? c.studionet ?? c.localnet;
-    if (!chain) throw new Error("No GenLayer chain definition found in genlayer-js/chains");
+    // Chain objects are looked up by name because the export set differs
+    // between SDK versions; `any` here is deliberate — the SDK's own chain
+    // type is what createClient wants back, and narrowing it by hand would
+    // just restate a shape that is allowed to change under us.
+    const c = chains as unknown as Record<string, any>;
+    const chain = c.studioDevnet ?? c.studioNext ?? c.studionet ?? c.localnet;
+    if (!chain) {
+      throw new Error("No GenLayer chain definition found in genlayer-js/chains");
+    }
     // A connected wallet signs as itself; without one, fall back to a
     // generated account so the app still reads the chain and renders.
     const client = createClient({
       chain,
       endpoint: config.studioUrl,
-      account: config.account ?? createAccount(),
+      // A connected wallet is an address string; viem's account type wants a
+      // 0x-prefixed template literal, which a runtime string cannot prove it
+      // is. The wallet module only ever supplies EIP-1193 addresses.
+      account: (config.account as `0x${string}` | undefined) ?? createAccount(),
     });
     // The account comes from the client we just built with createAccount();
     // the SDK has no separate connected-accounts lookup.
