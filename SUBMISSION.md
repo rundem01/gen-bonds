@@ -5,7 +5,7 @@ Everything the GenBonds hackathon entry needs, and what is left to fill in.
 ## Before pushing
 
 - [ ] Replace `<address>` in `README.md` (the **Deployed** table, two places)
-      with your Studionet contract address.
+      with your Studio Next contract address.
 - [ ] Replace `<your handle>` in `PITCH.md` with your GitHub username.
 - [ ] Replace `<address>` in `PITCH.md` with the same contract address.
 
@@ -13,8 +13,8 @@ Everything the GenBonds hackathon entry needs, and what is left to fill in.
 
 - **App:** https://gen-bonds-real.vercel.app
 - **Code:** https://github.com/rundem01/gen-bonds
-- **Contract:** `0xAC7f02f86b0F49F0C271A962082cdca7D9c942Eb` on Studionet
-- **Settlement tx:** `0x8cd1b6ea3c14c815ba5faeeed345f572a16a111bb0fec3a152dc157dcb9a274e`
+- **Contract:** `0x88dbAe3C8D637D0ad53Fe6424c53e72F61566e0c` on Studio Next
+- **Settlement tx:** `0x86bdd8fac4522de540f1b8a24a751fb40ccbc97b5c804125a31a96d9ed310593`
 
 ## Push
 
@@ -38,12 +38,12 @@ places and never to set a price: task difficulty at bind, delivery adjudication
 at settle, and clock agreement. Everything else is integer arithmetic on stored
 state, so a hallucinating validator cannot invent a premium.
 
-**The evidence** — a live Studionet deployment with the full lifecycle executed
+**The evidence** — a live Studio Next deployment with the full lifecycle executed
 end to end: fund, bind, deliver, adjudicate, settle, reprice. A validator
 fetched a real file from a public URL, judged it against criteria written in
 English, and breached the bond, citing the specific missing field. The agent's
 price moved 1050 -> 1340 bps in one transaction. Settlement tx
-`0x8cd1b6ea3c14c815ba5faeeed345f572a16a111bb0fec3a152dc157dcb9a274e`,
+`0x86bdd8fac4522de540f1b8a24a751fb40ccbc97b5c804125a31a96d9ed310593`,
 verifiable on the public explorer without trusting a screenshot.
 
 **The engineering** — 21 actuarial tests, 50 cross-language pricing vectors
