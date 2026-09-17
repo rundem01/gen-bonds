@@ -24,6 +24,74 @@ the way past. A five-star rating cannot do that.
 
 ---
 
+## For reviewers — verify it yourself in five minutes
+
+Three levels, each self-contained. The first needs nothing but a browser.
+
+### 1. Read the price off the chain (no wallet, no transaction)
+
+Open [Studio Next](https://studio-next.genlayer.com), load contract
+`0x88dbAe3C8D637D0ad53Fe6424c53e72F61566e0c`, and call `price_of_trust` with:
+
+```
+0xADB9F0b38CF9Df397bb7D7dbC4B61D7422d86e1b
+```
+
+**You should see** an agent that has settled exactly one bond and been punished
+for it:
+
+```json
+{"loss_rate_bps": 1290, "base_premium_bps": 1340, "collateral_bps": 3290,
+ "effective_settlements": 1, "collateral_lost": "300000000000000000",
+ "evidenced": true}
+```
+
+Before that bond settled, the same call returned `1000 / 1050 / 3000` with
+`evidenced: false`. The difference is the entire thesis: 290 basis points of
+face value, on every bond this agent writes from now on, plus 0.3 GEN of its
+own capital gone.
+
+### 2. Read the verdict that caused it
+
+Transaction `0x86bdd8fac4522de540f1b8a24a751fb40ccbc97b5c804125a31a96d9ed310593`.
+
+**You should see** a validator's own words, not a status code:
+
+```json
+{"verdict": "breached", "note": "JSON lacks required data field"}
+```
+
+The agent had delivered `{"summary": "Report complete."}` against criteria
+requiring both a summary and a data field. A machine read the work, found the
+gap, and moved the money.
+
+### 3. Run the whole cycle yourself
+
+Deploy `contracts/GenBonds.py` to Studio Next with any URL prefix as the
+trusted evidence host — `https://raw.githubusercontent.com` works. **You should
+get a fresh contract address of your own**, and `price_of_trust` on any address
+will return the unproven-agent baseline: `1000 / 1050 / 3000`,
+`evidenced: false`. Nothing is trusted and nothing is presumed fraudulent; a new
+agent pays median-agent prices until the market has evidence.
+
+Then:
+
+| Step | Call | What you should see |
+| --- | --- | --- |
+| Fund | `deposit` (GEN) → `stake` (wei) | `pool` shows your capital as `free` |
+| Price it | `bind` | Consensus scores task difficulty; returns a bond id |
+| Deliver | `submit_delivery` | Any URL under your trusted host |
+| Settle | `settle` | A validator fetches the file and returns a verdict |
+| Check | `price_of_trust` | The same address, repriced |
+
+Deliver something that satisfies your criteria and the bond is honoured, the
+premium is earned, and the collateral comes back. Deliver something that misses
+them and you will watch the price move against you.
+
+Use **Leader Only** execution mode for `settle` on Studio Next; full consensus
+is reliable on stable Studionet but stalls intermittently on the release
+candidate.
+
 ## Try it
 
 **[gen-bonds-real.vercel.app](https://gen-bonds-real.vercel.app)**
