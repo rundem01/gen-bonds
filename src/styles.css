@@ -902,3 +902,67 @@ input[type="range"] {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ----------------------------------------------------------------- light
+
+   Not a tint of the dark theme — a different material. Dark is an engraved
+   plate read under a lamp; light is the paper slip the same numbers get
+   written onto. The brass stays, because the scale is brass in both.
+*/
+
+:root[data-theme="light"] {
+  --plate: #e8eae2;
+  --plate-2: #f5f6f1;
+  --plate-3: #eceee6;
+  --bone: #12181c;
+  --bone-2: #4a565d;
+  --bone-3: #77838a;
+  --brass: #8a6118;
+  --claim: #8f2333;
+  --clean: #1d554b;
+  --edge: #ccd2c4;
+}
+
+:root[data-theme="light"] .panel--instrument {
+  background:
+    radial-gradient(120% 90% at 22% 0%, rgba(138, 97, 24, 0.06), transparent 60%),
+    linear-gradient(var(--edge) 1px, transparent 1px) 0 0 / 100% 28px,
+    linear-gradient(90deg, var(--edge) 1px, transparent 1px) 0 0 / 28px 100%,
+    var(--plate-2);
+}
+
+:root[data-theme="light"] .instrument__mark circle {
+  fill: var(--plate-2);
+}
+
+:root[data-theme="light"] .button {
+  background: var(--bone);
+  color: var(--plate-2);
+  border-color: var(--bone);
+}
+
+:root[data-theme="light"] .button:hover:not(:disabled) {
+  background: #000;
+  border-color: #000;
+}
+
+:root[data-theme="light"] .dialog::backdrop {
+  background: rgba(18, 24, 28, 0.36);
+}
+
+.theme {
+  font-size: var(--t-fine);
+  padding: 5px 11px;
+  border: 1px solid var(--edge);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--bone-3);
+  font-family: var(--figures);
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease;
+}
+
+.theme:hover {
+  border-color: var(--bone-2);
+  color: var(--bone);
+}

@@ -13,6 +13,7 @@
  */
 
 import { estimateDifficulty } from "./core/difficulty.ts";
+import { ThemeController } from "./core/theme.ts";
 import { Wallet } from "./core/wallet.ts";
 import { addr, eth, hours as fmtHours, pct, toWei } from "./core/format.ts";
 import { afterSettlement, quote, PREMIUM_CAP_BPS } from "./core/pricing.ts";
@@ -42,6 +43,7 @@ const DEFAULT_CRITERIA =
 
 async function boot(): Promise<void> {
   const contractAddress = import.meta.env?.VITE_CONTRACT_ADDRESS as string | undefined;
+  const theme = new ThemeController();
   const wallet = new Wallet();
   await wallet.restore();
 
@@ -78,7 +80,7 @@ async function boot(): Promise<void> {
     busy: false,
   });
 
-  mount(store, wallet);
+  mount(store, wallet, theme);
   await refresh(store);
 
   // Reconnect the backend whenever the account changes, so writes are always
@@ -146,7 +148,7 @@ function runRiskModel(store: Store<AppState>): void {
 
 // --------------------------------------------------------------------- views
 
-function mount(store: Store<AppState>, wallet: Wallet): void {
+function mount(store: Store<AppState>, wallet: Wallet, theme: ThemeController): void {
   const app = document.querySelector<HTMLElement>("#app")!;
   app.innerHTML = template();
 
@@ -154,6 +156,17 @@ function mount(store: Store<AppState>, wallet: Wallet): void {
     store.set({ selected: address, notice: null }),
   );
   const book = new BookView(app.querySelector("[data-book]")!, (bond) => openBond(store, bond));
+
+  const themeButton = app.querySelector<HTMLButtonElement>("[data-theme-toggle]")!;
+  themeButton.addEventListener("click", () => theme.toggle());
+  theme.subscribe((current) => {
+    // The label names what clicking does, not what is currently on.
+    themeButton.textContent = current === "dark" ? "paper" : "plate";
+    themeButton.setAttribute(
+      "aria-label",
+      current === "dark" ? "Switch to the light theme" : "Switch to the dark theme",
+    );
+  });
 
   const walletButton = app.querySelector<HTMLButtonElement>("[data-wallet]")!;
   walletButton.addEventListener("click", async () => {
@@ -510,6 +523,7 @@ function template(): string {
     </div>
     <div class="masthead__actions">
       <span class="mode" data-mode></span>
+      <button class="theme" type="button" data-theme-toggle aria-live="polite">lights</button>
       <button class="wallet" type="button" data-wallet>connect wallet</button>
     </div>
   </header>
