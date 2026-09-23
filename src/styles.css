@@ -1,42 +1,44 @@
 /*
   GenBonds — visual system.
 
-  The subject is underwriting, so the surface borrows from an underwriting
-  slip: cool ledger paper, ink-blue type, and marks in the two colours a
-  syndicate actually uses — oxblood for a claim, deep green for a clean risk.
+  An engraved instrument plate. The subject is measurement under uncertainty,
+  so the surface is read the way a barometer face or a sextant arc is read:
+  bone marks and a brass scale cut into dark metal, lit from one side.
 
-  One idea carries the page: the yardstick is an instrument, and the number it
-  reads is the product. It gets the scale, the width, and the only motion.
-  Everything else is apparatus and stays quiet.
+  One idea carries the page. The whole market sits on a single rule, every
+  agent plotted by what its promise costs, and the distance between the
+  cheapest and the dearest is the spread the market charges for reliability.
+  That instrument is full width, it is the first thing on the page, and it is
+  the only thing that moves. Everything else is apparatus.
 
-  Every figure is monospaced, because every figure here is a price and prices
-  are read in columns. Prose is never monospaced — that distinction is the
-  whole point of the pairing.
+  Figures are monospaced; prose never is. The pairing only means something if
+  "every number here is a price" is literally true.
 */
 
 :root {
-  --ink: #12181c;
-  --ink-2: #47545c;
-  --ink-3: #78848b;
-  --paper: #f4f5f0;
-  --ground: #e4e7df;
-  --rule: #c6ccbe;
-  --rule-2: #d8ddd1;
-  --claim: #7c1f2a;
-  --clean: #1e4b45;
+  --plate: #0e1418;
+  --plate-2: #141c21;
+  --plate-3: #1b252b;
+  --bone: #ece6d8;
+  --bone-2: #a8b0ad;
+  --bone-3: #6f7a79;
+  --brass: #c08f45;
+  --claim: #c4515f;
+  --clean: #5fa391;
+  --edge: #2a363c;
 
-  /* Modular scale, 1.25. Sizes are named for their job, not their pixels. */
-  --t-reading: clamp(64px, 13vw, 148px);
-  --t-display: clamp(28px, 4vw, 40px);
-  --t-lead: 19px;
+  --t-reading: clamp(60px, 12vw, 152px);
+  --t-display: clamp(24px, 3.2vw, 34px);
+  --t-lead: 18px;
   --t-body: 16px;
   --t-small: 14px;
   --t-fine: 12.5px;
 
   --space: 8px;
-  --measure: 62ch;
+  --measure: 60ch;
 
-  --display: "Familjen Grotesk", "Helvetica Neue", sans-serif;
+  --serif: "Instrument Serif", Georgia, serif;
+  --sans: "Familjen Grotesk", "Helvetica Neue", sans-serif;
   --figures: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
@@ -50,22 +52,22 @@ html {
 
 body {
   margin: 0;
-  background: var(--ground);
-  color: var(--ink);
-  font-family: var(--display);
+  background: var(--plate);
+  color: var(--bone);
+  font-family: var(--sans);
   font-size: var(--t-body);
-  line-height: 1.5;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
 #app {
-  max-width: 1180px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: calc(var(--space) * 4) calc(var(--space) * 3) calc(var(--space) * 12);
 }
 
-/* Figures are tabular everywhere, without exception. */
 .yardstick__reading,
+.instrument__reading,
 .quote__value,
 .quote__bps,
 .chip__rate,
@@ -78,6 +80,7 @@ body {
 .breakdown td:first-of-type,
 .wallet,
 .mode,
+.sheet__bond,
 input[type="text"],
 input[type="url"] {
   font-family: var(--figures);
@@ -93,8 +96,8 @@ input[type="url"] {
   gap: calc(var(--space) * 2);
   flex-wrap: wrap;
   padding-bottom: calc(var(--space) * 2);
-  margin-bottom: calc(var(--space) * 6);
-  border-bottom: 1px solid var(--rule);
+  margin-bottom: calc(var(--space) * 5);
+  border-bottom: 1px solid var(--edge);
 }
 
 .masthead__mark {
@@ -105,28 +108,29 @@ input[type="url"] {
 }
 
 .wordmark {
-  font-size: 23px;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
-/* The wordmark's rule reads as a measuring edge, which is the whole metaphor.
-   It is the one ornamental mark on the page and it earns its place. */
+/* The one ornament: a measuring edge, which is the whole metaphor. */
 .wordmark__rule {
-  width: 52px;
+  width: 56px;
   height: 8px;
   align-self: center;
-  border-bottom: 1px solid var(--ink);
-  background-image: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 7px);
+  border-bottom: 1px solid var(--brass);
+  background-image: repeating-linear-gradient(90deg, var(--brass) 0 1px, transparent 1px 7px);
   background-position: bottom;
   background-repeat: repeat-x;
   background-size: 7px 4px;
+  opacity: 0.85;
 }
 
 .tagline {
   font-size: var(--t-small);
-  color: var(--ink-2);
+  color: var(--bone-3);
 }
 
 .masthead__actions {
@@ -139,10 +143,10 @@ input[type="url"] {
 .wallet {
   font-size: var(--t-fine);
   padding: 5px 11px;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--edge);
   border-radius: 2px;
   background: transparent;
-  color: var(--ink-2);
+  color: var(--bone-3);
 }
 
 .mode[data-tone="live"] {
@@ -152,17 +156,18 @@ input[type="url"] {
 
 .wallet {
   cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease;
+  transition: border-color 140ms ease, color 140ms ease;
 }
 
 .wallet:hover:not(:disabled) {
-  border-color: var(--ink);
-  color: var(--ink);
+  border-color: var(--bone-2);
+  color: var(--bone);
 }
 
 .wallet:disabled {
   cursor: not-allowed;
-  color: var(--ink-3);
+  color: var(--bone-3);
+  opacity: 0.6;
 }
 
 .wallet[data-tone="ok"] {
@@ -171,129 +176,180 @@ input[type="url"] {
 }
 
 .wallet[data-tone="warn"] {
-  border-color: var(--claim);
-  color: var(--claim);
+  border-color: var(--brass);
+  color: var(--brass);
 }
 
-/* ------------------------------------------------------------ the hero */
+/* ----------------------------------------------------------- instrument */
 
-/* The instrument sits on its own chart paper. Confining the ruled grid to
-   this one surface makes it read as part of the instrument rather than as
-   wallpaper behind the whole page. */
 .panel--instrument {
-  background: var(--paper);
-  background-image:
-    linear-gradient(var(--rule-2) 1px, transparent 1px),
-    linear-gradient(90deg, var(--rule-2) 1px, transparent 1px);
-  background-size: 100% 28px, 28px 100%;
-  border: 1px solid var(--rule);
-  padding: calc(var(--space) * 5) calc(var(--space) * 4);
+  background:
+    radial-gradient(120% 90% at 22% 0%, rgba(192, 143, 69, 0.07), transparent 60%),
+    var(--plate-2);
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+  padding: calc(var(--space) * 5) calc(var(--space) * 4) calc(var(--space) * 4);
   margin-bottom: calc(var(--space) * 3);
 }
 
-.yardstick__readout {
+.instrument__agent {
+  margin: 0 0 calc(var(--space) * 1.5);
+  font-family: var(--figures);
+  font-size: var(--t-small);
+  color: var(--brass);
+}
+
+.instrument__readout {
   display: flex;
   align-items: baseline;
-  gap: calc(var(--space) * 2);
+  gap: calc(var(--space) * 2.5);
   flex-wrap: wrap;
+  margin: 0;
 }
 
-.yardstick__reading {
+.instrument__reading {
   font-size: var(--t-reading);
-  font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 0.88;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.85;
 }
 
-.yardstick__unit {
+.instrument__unit {
+  font-family: var(--serif);
   font-size: var(--t-lead);
-  color: var(--ink-2);
-  max-width: 24ch;
+  line-height: 1.35;
+  color: var(--bone-2);
+  max-width: 22ch;
 }
 
-.yardstick__rule {
+.instrument__rule {
   display: block;
   width: 100%;
   height: auto;
-  margin-top: calc(var(--space) * 4);
+  margin-top: calc(var(--space) * 3);
   overflow: visible;
 }
 
-.yardstick__baseline {
-  stroke: var(--ink);
+.instrument__baseline {
+  stroke: var(--bone-2);
+  stroke-width: 1;
+}
+
+.instrument__tick {
+  stroke: var(--edge);
+}
+
+.instrument__tick--major {
+  stroke: var(--brass);
   stroke-width: 1.25;
 }
 
-.yardstick__tick {
-  stroke: var(--rule);
-}
-
-.yardstick__tick--major {
-  stroke: var(--ink-2);
-}
-
-.yardstick__label,
-.yardstick__axis-unit {
+.instrument__label,
+.instrument__axis {
   font-family: var(--figures);
-  fill: var(--ink-3);
+  fill: var(--bone-3);
   font-size: 14px;
 }
 
-.yardstick__label {
+.instrument__label {
   text-anchor: middle;
 }
 
-.yardstick__axis-unit {
+.instrument__axis {
   text-anchor: end;
   font-size: 12px;
 }
 
-.yardstick__span {
+/* ---- every agent, plotted ---- */
+
+.instrument__mark {
+  cursor: pointer;
+}
+
+.instrument__mark line {
+  stroke: var(--bone-3);
+  stroke-width: 1;
+  transition: stroke 160ms ease;
+}
+
+.instrument__mark circle {
+  fill: var(--plate-2);
+  stroke: var(--bone-3);
+  stroke-width: 1.25;
+  transition: stroke 160ms ease, fill 160ms ease;
+}
+
+.instrument__mark-label {
+  font-family: var(--figures);
+  font-size: 11.5px;
+  fill: var(--bone-3);
+  text-anchor: middle;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.instrument__mark:hover line,
+.instrument__mark--on line {
+  stroke: var(--bone);
+}
+
+.instrument__mark:hover circle,
+.instrument__mark--on circle {
+  stroke: var(--bone);
+  fill: var(--bone);
+}
+
+.instrument__mark:hover .instrument__mark-label,
+.instrument__mark--on .instrument__mark-label {
+  opacity: 1;
+  fill: var(--bone);
+}
+
+/* ---- the needles ---- */
+
+.instrument__span {
   fill: var(--claim);
-  opacity: 0.09;
+  opacity: 0.13;
   transition: x 520ms cubic-bezier(0.16, 1, 0.3, 1), width 520ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* The needle is the only thing on the page that moves on its own, and it
-   moves because a value changed. */
-.yardstick__needle {
+.instrument__needle {
   transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.yardstick__needle path {
-  fill: var(--ink);
+.instrument__needle path {
+  fill: var(--bone);
 }
 
-.yardstick__needle line {
-  stroke: var(--ink);
-  stroke-width: 2;
+.instrument__needle line {
+  stroke: var(--bone);
+  stroke-width: 1.75;
 }
 
-.yardstick__needle--ghost path {
+.instrument__needle--ghost path {
   fill: none;
   stroke: var(--claim);
   stroke-width: 1.5;
-  stroke-dasharray: 3 3;
 }
 
-.yardstick__needle--ghost line {
+.instrument__needle--ghost line {
   stroke: var(--claim);
   stroke-width: 1.5;
   stroke-dasharray: 3 4;
 }
 
-.yardstick__needle-label {
+.instrument__ghost-label {
   fill: var(--claim);
   font-family: var(--figures);
-  font-size: 12.5px;
+  font-size: 12px;
   text-anchor: middle;
 }
 
-.yardstick__caption {
+.instrument__caption {
   max-width: var(--measure);
   margin: calc(var(--space) * 3) 0 0;
   font-size: var(--t-small);
-  color: var(--ink-2);
+  color: var(--bone-2);
 }
 
 /* ---------------------------------------------------------------- chips */
@@ -311,24 +367,23 @@ input[type="url"] {
   gap: 8px;
   padding: 6px 11px;
   background: transparent;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--edge);
   border-radius: 2px;
   font-family: inherit;
   font-size: var(--t-small);
-  color: var(--ink-2);
+  color: var(--bone-3);
   cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease;
+  transition: border-color 140ms ease, color 140ms ease;
 }
 
 .chip:hover {
-  border-color: var(--ink-2);
-  color: var(--ink);
+  border-color: var(--bone-3);
+  color: var(--bone);
 }
 
 .chip--on {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--paper);
+  border-color: var(--brass);
+  color: var(--brass);
 }
 
 .chip__rate {
@@ -338,16 +393,18 @@ input[type="url"] {
 /* --------------------------------------------------------------- panels */
 
 .panel {
-  background: var(--paper);
-  border: 1px solid var(--rule);
+  background: var(--plate-2);
+  border: 1px solid var(--edge);
+  border-radius: 3px;
   padding: calc(var(--space) * 3);
 }
 
 .panel__title {
+  font-family: var(--serif);
   font-size: var(--t-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
   margin: 0 0 calc(var(--space) * 2);
 }
 
@@ -379,7 +436,7 @@ input[type="url"] {
 }
 
 .muted {
-  color: var(--ink-3);
+  color: var(--bone-3);
   font-size: var(--t-fine);
   max-width: var(--measure);
   margin: calc(var(--space) * 2) 0 0;
@@ -395,14 +452,14 @@ input[type="url"] {
 .field > span:first-child {
   display: block;
   font-size: var(--t-small);
-  color: var(--ink-2);
+  color: var(--bone-2);
   margin-bottom: 6px;
 }
 
 .field b {
   font-family: var(--figures);
   font-weight: 500;
-  color: var(--ink);
+  color: var(--bone);
 }
 
 .field__row {
@@ -415,7 +472,7 @@ input[type="url"] {
   font-family: var(--figures);
   font-style: normal;
   font-size: var(--t-fine);
-  color: var(--ink-3);
+  color: var(--bone-3);
 }
 
 input[type="text"],
@@ -423,15 +480,15 @@ input[type="url"],
 textarea {
   width: 100%;
   padding: 9px 11px;
-  background: var(--ground);
-  border: 1px solid var(--rule);
+  background: var(--plate);
+  border: 1px solid var(--edge);
   border-radius: 2px;
   font-size: var(--t-small);
-  color: var(--ink);
+  color: var(--bone);
 }
 
 textarea {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: var(--t-body);
   line-height: 1.5;
   resize: vertical;
@@ -439,16 +496,16 @@ textarea {
 
 input[type="range"] {
   width: 100%;
-  accent-color: var(--ink);
+  accent-color: var(--brass);
 }
 
 :focus-visible {
-  outline: 2px solid var(--claim);
+  outline: 2px solid var(--brass);
   outline-offset: 2px;
 }
 
 .quote {
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--edge);
   padding-top: calc(var(--space) * 1.5);
   margin-bottom: calc(var(--space) * 2);
 }
@@ -467,7 +524,7 @@ input[type="range"] {
 .quote__label {
   flex: 1 1 auto;
   font-size: var(--t-small);
-  color: var(--ink-2);
+  color: var(--bone-2);
 }
 
 .quote__value {
@@ -478,12 +535,13 @@ input[type="range"] {
 
 .quote__headline--minor .quote__value {
   font-size: 17px;
-  font-weight: 500;
+  font-weight: 400;
+  color: var(--bone-2);
 }
 
 .quote__bps {
   font-size: var(--t-fine);
-  color: var(--ink-2);
+  color: var(--brass);
   min-width: 6ch;
   text-align: right;
 }
@@ -497,25 +555,25 @@ input[type="range"] {
 .breakdown caption {
   text-align: left;
   font-size: var(--t-small);
-  color: var(--ink-2);
+  color: var(--bone-3);
   padding-bottom: 8px;
 }
 
 .breakdown th {
   text-align: left;
   font-weight: 400;
-  color: var(--ink-2);
+  color: var(--bone-2);
   padding: 5px 0;
 }
 
 .breakdown td {
   padding: 5px 0 5px 10px;
-  color: var(--ink-3);
+  color: var(--bone-3);
   font-size: var(--t-fine);
 }
 
 .breakdown td:first-of-type {
-  color: var(--ink);
+  color: var(--bone);
   text-align: right;
   white-space: nowrap;
   font-size: var(--t-small);
@@ -523,15 +581,15 @@ input[type="range"] {
 
 .breakdown tr + tr th,
 .breakdown tr + tr td {
-  border-top: 1px solid var(--rule-2);
+  border-top: 1px solid var(--edge);
 }
 
 .verdict {
   margin: calc(var(--space) * 2) 0 calc(var(--space) * 1.5);
   padding-left: 10px;
-  border-left: 2px solid var(--rule);
+  border-left: 2px solid var(--edge);
   font-size: var(--t-small);
-  color: var(--ink-2);
+  color: var(--bone-2);
   max-width: var(--measure);
 }
 
@@ -540,7 +598,7 @@ input[type="range"] {
 }
 
 .verdict[data-tone="warn"] {
-  border-color: var(--claim);
+  border-color: var(--brass);
 }
 
 .verdict[data-tone="bad"] {
@@ -550,25 +608,26 @@ input[type="range"] {
 
 .button {
   display: inline-block;
-  padding: 10px 18px;
-  background: var(--ink);
-  color: var(--paper);
-  border: 1px solid var(--ink);
+  padding: 11px 18px;
+  background: var(--bone);
+  color: var(--plate);
+  border: 1px solid var(--bone);
   border-radius: 2px;
   font-family: inherit;
   font-size: var(--t-small);
   cursor: pointer;
-  transition: background 120ms ease;
+  transition: background 140ms ease, border-color 140ms ease;
 }
 
 .button:hover:not(:disabled) {
-  background: #000;
+  background: #fff;
+  border-color: #fff;
 }
 
 .button:disabled {
   background: transparent;
-  color: var(--ink-3);
-  border-color: var(--rule);
+  color: var(--bone-3);
+  border-color: var(--edge);
   cursor: not-allowed;
 }
 
@@ -578,8 +637,8 @@ input[type="range"] {
 
 .button--quiet {
   background: transparent;
-  color: var(--ink-2);
-  border-color: var(--rule);
+  color: var(--bone-2);
+  border-color: var(--edge);
 }
 
 /* ------------------------------------------------------------- the book */
@@ -588,7 +647,7 @@ input[type="range"] {
   height: 452px;
   overflow-y: auto;
   position: relative;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--edge);
   contain: layout paint;
 }
 
@@ -604,19 +663,19 @@ input[type="range"] {
   align-items: center;
   gap: calc(var(--space) * 1.5);
   height: 56px;
-  padding: 0 4px;
-  border-bottom: 1px solid var(--rule-2);
+  padding: 0 6px;
+  border-bottom: 1px solid var(--edge);
   cursor: pointer;
   font-size: var(--t-small);
 }
 
 .bond:hover {
-  background: var(--ground);
+  background: var(--plate-3);
 }
 
 .bond__id {
   font-size: var(--t-fine);
-  color: var(--ink-3);
+  color: var(--bone-3);
 }
 
 .bond__party {
@@ -627,10 +686,11 @@ input[type="range"] {
 
 .bond__obligor {
   font-size: var(--t-fine);
+  color: var(--bone-2);
 }
 
 .bond__criteria {
-  color: var(--ink-3);
+  color: var(--bone-3);
   font-size: var(--t-fine);
   white-space: nowrap;
   overflow: hidden;
@@ -648,10 +708,10 @@ input[type="range"] {
 .bond__face em,
 .bond__rate em,
 .bond__state em {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-style: normal;
   font-size: 11px;
-  color: var(--ink-3);
+  color: var(--bone-3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -670,7 +730,7 @@ input[type="range"] {
 }
 
 .bond--disputed .bond__state {
-  color: var(--ink-2);
+  color: var(--brass);
 }
 
 @media (max-width: 620px) {
@@ -698,7 +758,7 @@ input[type="range"] {
 
 .stats dt {
   font-size: var(--t-fine);
-  color: var(--ink-3);
+  color: var(--bone-3);
 }
 
 .stats dd {
@@ -722,16 +782,17 @@ input[type="range"] {
   display: flex;
   align-items: flex-end;
   gap: 2px;
-  height: 132px;
+  height: 136px;
   padding-bottom: 2px;
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--bone-3);
 }
 
 .hist__bar {
   flex: 1 1 0;
   min-height: 1px;
-  background: var(--ink);
-  opacity: 0.8;
+  background: var(--brass);
+  opacity: 0.7;
+  transition: opacity 120ms ease, background 120ms ease;
 }
 
 .hist__bar:hover {
@@ -744,8 +805,8 @@ input[type="range"] {
 .notice {
   margin: 0 0 calc(var(--space) * 3);
   padding: 10px 14px;
-  border-left: 3px solid var(--ink);
-  background: var(--paper);
+  border-left: 3px solid var(--edge);
+  background: var(--plate-2);
   font-size: var(--t-small);
   max-width: var(--measure);
 }
@@ -754,7 +815,10 @@ input[type="range"] {
   border-color: var(--clean);
 }
 
-.notice[data-tone="warn"],
+.notice[data-tone="warn"] {
+  border-color: var(--brass);
+}
+
 .notice[data-tone="bad"] {
   border-color: var(--claim);
 }
@@ -764,14 +828,14 @@ input[type="range"] {
 .dialog {
   width: min(560px, calc(100vw - 32px));
   padding: 0;
-  border: 1px solid var(--ink);
-  border-radius: 2px;
-  background: var(--paper);
-  color: var(--ink);
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+  background: var(--plate-2);
+  color: var(--bone);
 }
 
 .dialog::backdrop {
-  background: rgba(18, 24, 28, 0.42);
+  background: rgba(8, 12, 14, 0.66);
 }
 
 .sheet {
@@ -786,12 +850,10 @@ input[type="range"] {
 }
 
 .sheet__bond {
-  font-family: var(--figures);
   font-size: var(--t-small);
-  color: var(--ink-2);
+  color: var(--bone-3);
 }
 
-/* A settled bond gets stamped, the way a slip does. */
 .stamp {
   font-family: var(--figures);
   font-size: var(--t-fine);
@@ -799,7 +861,7 @@ input[type="range"] {
   border: 2px solid currentColor;
   border-radius: 2px;
   transform: rotate(-3deg);
-  color: var(--ink-2);
+  color: var(--bone-3);
 }
 
 .stamp--honored {
@@ -813,14 +875,14 @@ input[type="range"] {
 .sheet__criteria {
   margin: 0 0 calc(var(--space) * 2);
   padding: calc(var(--space) * 1.5);
-  background: var(--ground);
-  border-left: 2px solid var(--rule);
+  background: var(--plate);
+  border-left: 2px solid var(--edge);
   font-size: var(--t-small);
 }
 
 .sheet__verdict {
   font-size: var(--t-small);
-  color: var(--ink-2);
+  color: var(--bone-2);
 }
 
 .sheet__foot {

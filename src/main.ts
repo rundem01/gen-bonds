@@ -150,7 +150,9 @@ function mount(store: Store<AppState>, wallet: Wallet): void {
   const app = document.querySelector<HTMLElement>("#app")!;
   app.innerHTML = template();
 
-  const yardstick = new Yardstick(app.querySelector("[data-yardstick]")!);
+  const yardstick = new Yardstick(app.querySelector("[data-yardstick]")!, (address) =>
+    store.set({ selected: address, notice: null }),
+  );
   const book = new BookView(app.querySelector("[data-book]")!, (bond) => openBond(store, bond));
 
   const walletButton = app.querySelector<HTMLButtonElement>("[data-wallet]")!;
@@ -251,6 +253,17 @@ function renderYardstick(yardstick: Yardstick, state: AppState): void {
   const agent = currentAgent(state);
   if (!agent) return;
 
+  // The whole market on one rule, so the selected agent is read against its
+  // peers rather than against nothing.
+  yardstick.setMarket(
+    state.agents.map((a) => ({
+      address: a.address,
+      label: a.label,
+      premiumBps: a.basePremiumBps,
+    })),
+    agent.address,
+  );
+
   const after = afterSettlement(
     {
       weightedFailures: agent.weightedFailures,
@@ -272,7 +285,7 @@ function renderYardstick(yardstick: Yardstick, state: AppState): void {
     ? `${agent.label} carries an effective record of ${agent.effectiveSettlements} settlements. One more breach moves its price to ${pct(ghost.premiumBps)} — a jump of ${pct(ghost.premiumBps - agent.basePremiumBps)} of face on every bond it writes after that.`
     : `${agent.label} has no settled bonds. It pays the median-agent rate until the market has evidence, and its first breach costs it ${pct(ghost.premiumBps - agent.basePremiumBps)} of face on everything after.`;
 
-  yardstick.update(agent.basePremiumBps, ghost.premiumBps, note);
+  yardstick.update(agent.basePremiumBps, ghost.premiumBps, agent.label, note);
 }
 
 function renderSlip(app: HTMLElement, state: AppState): void {
