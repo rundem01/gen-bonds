@@ -1,27 +1,40 @@
 /*
   GenBonds — visual system.
 
-  The subject is underwriting, so the surface is an underwriting slip: cool
-  ledger paper, a faint ruled grid, ink-blue type, and stamps in the two colours
-  a syndicate actually uses — oxblood for a claim, deep green for a clean risk.
-  Every figure is monospaced, because in this product every figure is a price
-  and prices are read in columns.
+  The subject is underwriting, so the surface borrows from an underwriting
+  slip: cool ledger paper, ink-blue type, and marks in the two colours a
+  syndicate actually uses — oxblood for a claim, deep green for a clean risk.
+
+  One idea carries the page: the yardstick is an instrument, and the number it
+  reads is the product. It gets the scale, the width, and the only motion.
+  Everything else is apparatus and stays quiet.
+
+  Every figure is monospaced, because every figure here is a price and prices
+  are read in columns. Prose is never monospaced — that distinction is the
+  whole point of the pairing.
 */
 
 :root {
-  --ink: #131a1f;
-  --ink-soft: #46545c;
-  --ink-faint: #75828a;
-  --ledger: #e3e7dd;
-  --paper: #f3f5ef;
-  --rule: #c2c9ba;
-  --rule-soft: #d5dbcd;
-  --stamp: #7a1f2b;
-  --bind: #1d4a46;
-  --amber: #9a6b16;
+  --ink: #12181c;
+  --ink-2: #47545c;
+  --ink-3: #78848b;
+  --paper: #f4f5f0;
+  --ground: #e4e7df;
+  --rule: #c6ccbe;
+  --rule-2: #d8ddd1;
+  --claim: #7c1f2a;
+  --clean: #1e4b45;
+
+  /* Modular scale, 1.25. Sizes are named for their job, not their pixels. */
+  --t-reading: clamp(64px, 13vw, 148px);
+  --t-display: clamp(28px, 4vw, 40px);
+  --t-lead: 19px;
+  --t-body: 16px;
+  --t-small: 14px;
+  --t-fine: 12.5px;
 
   --space: 8px;
-  --radius: 3px;
+  --measure: 62ch;
 
   --display: "Familjen Grotesk", "Helvetica Neue", sans-serif;
   --figures: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
@@ -37,24 +50,38 @@ html {
 
 body {
   margin: 0;
-  background-color: var(--ledger);
-  /* The slip's ruled grid. Fixed to the viewport so it reads as paper under
-     the content rather than as a texture on it. */
-  background-image:
-    linear-gradient(var(--rule-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
-  background-size: 100% 32px, 32px 100%;
-  background-attachment: fixed;
+  background: var(--ground);
   color: var(--ink);
   font-family: var(--display);
-  font-size: 16px;
-  line-height: 1.45;
+  font-size: var(--t-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 #app {
-  max-width: 1240px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: calc(var(--space) * 4) calc(var(--space) * 3) calc(var(--space) * 10);
+  padding: calc(var(--space) * 4) calc(var(--space) * 3) calc(var(--space) * 12);
+}
+
+/* Figures are tabular everywhere, without exception. */
+.yardstick__reading,
+.quote__value,
+.quote__bps,
+.chip__rate,
+.stats dd,
+.bond__id,
+.bond__obligor,
+.bond__face,
+.bond__rate,
+.bond__state,
+.breakdown td:first-of-type,
+.wallet,
+.mode,
+input[type="text"],
+input[type="url"] {
+  font-family: var(--figures);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ------------------------------------------------------------- masthead */
@@ -66,8 +93,8 @@ body {
   gap: calc(var(--space) * 2);
   flex-wrap: wrap;
   padding-bottom: calc(var(--space) * 2);
-  border-bottom: 2px solid var(--ink);
-  margin-bottom: calc(var(--space) * 3);
+  margin-bottom: calc(var(--space) * 6);
+  border-bottom: 1px solid var(--rule);
 }
 
 .masthead__mark {
@@ -78,205 +105,159 @@ body {
 }
 
 .wordmark {
-  font-size: clamp(30px, 5vw, 44px);
+  font-size: 23px;
   font-weight: 700;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.025em;
   line-height: 1;
 }
 
+/* The wordmark's rule reads as a measuring edge, which is the whole metaphor.
+   It is the one ornamental mark on the page and it earns its place. */
 .wordmark__rule {
-  flex: 1 1 40px;
-  min-width: 40px;
-  height: 9px;
-  border-top: 1px solid var(--ink);
+  width: 52px;
+  height: 8px;
+  align-self: center;
   border-bottom: 1px solid var(--ink);
-  background-image: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 8px);
+  background-image: repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 7px);
   background-position: bottom;
   background-repeat: repeat-x;
-  background-size: 8px 5px;
-  align-self: center;
+  background-size: 7px 4px;
 }
 
 .tagline {
-  font-size: 15px;
-  color: var(--ink-soft);
+  font-size: var(--t-small);
+  color: var(--ink-2);
 }
 
-.mode {
-  font-family: var(--figures);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  padding: 4px 9px;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  color: var(--amber);
+.masthead__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space);
+}
+
+.mode,
+.wallet {
+  font-size: var(--t-fine);
+  padding: 5px 11px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink-2);
 }
 
 .mode[data-tone="live"] {
-  color: var(--bind);
+  border-color: var(--clean);
+  color: var(--clean);
 }
 
-/* ---------------------------------------------------------------- panels */
-
-.panel {
-  background: var(--paper);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: calc(var(--space) * 3);
-  box-shadow: 0 1px 0 rgba(19, 26, 31, 0.06);
-}
-
-.panel + .panel,
-.grid {
-  margin-top: calc(var(--space) * 3);
-}
-
-.panel__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: calc(var(--space) * 2);
-  flex-wrap: wrap;
-  margin-bottom: calc(var(--space) * 2);
-}
-
-.eyebrow {
-  font-family: var(--figures);
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--ink-soft);
-  margin: 0;
-}
-
-.grid {
-  display: grid;
-  gap: calc(var(--space) * 3);
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.muted {
-  color: var(--ink-faint);
-  font-size: 13px;
-  margin: calc(var(--space) * 1.5) 0 0;
-}
-
-/* ------------------------------------------------------------- yardstick */
-
-.roster {
-  display: flex;
-  gap: var(--space);
-  flex-wrap: wrap;
-}
-
-.chip {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 5px 10px;
-  background: transparent;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  font-family: inherit;
-  font-size: 13px;
-  color: var(--ink-soft);
+.wallet {
   cursor: pointer;
   transition: border-color 120ms ease, color 120ms ease;
 }
 
-.chip:hover {
-  border-color: var(--ink-soft);
+.wallet:hover:not(:disabled) {
+  border-color: var(--ink);
   color: var(--ink);
 }
 
-.chip--on {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--paper);
+.wallet:disabled {
+  cursor: not-allowed;
+  color: var(--ink-3);
 }
 
-.chip__rate {
-  font-family: var(--figures);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
+.wallet[data-tone="ok"] {
+  border-color: var(--clean);
+  color: var(--clean);
+}
+
+.wallet[data-tone="warn"] {
+  border-color: var(--claim);
+  color: var(--claim);
+}
+
+/* ------------------------------------------------------------ the hero */
+
+/* The instrument sits on its own chart paper. Confining the ruled grid to
+   this one surface makes it read as part of the instrument rather than as
+   wallpaper behind the whole page. */
+.panel--instrument {
+  background: var(--paper);
+  background-image:
+    linear-gradient(var(--rule-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule-2) 1px, transparent 1px);
+  background-size: 100% 28px, 28px 100%;
+  border: 1px solid var(--rule);
+  padding: calc(var(--space) * 5) calc(var(--space) * 4);
+  margin-bottom: calc(var(--space) * 3);
 }
 
 .yardstick__readout {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: calc(var(--space) * 2);
   flex-wrap: wrap;
 }
 
 .yardstick__reading {
-  font-family: var(--figures);
-  font-size: clamp(40px, 8vw, 66px);
+  font-size: var(--t-reading);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
+  letter-spacing: -0.045em;
+  line-height: 0.88;
 }
 
 .yardstick__unit {
-  font-size: 14px;
-  color: var(--ink-soft);
+  font-size: var(--t-lead);
+  color: var(--ink-2);
+  max-width: 24ch;
 }
 
 .yardstick__rule {
   display: block;
   width: 100%;
   height: auto;
-  margin-top: calc(var(--space) * 1.5);
+  margin-top: calc(var(--space) * 4);
   overflow: visible;
 }
 
 .yardstick__baseline {
   stroke: var(--ink);
-  stroke-width: 1.5;
+  stroke-width: 1.25;
 }
 
 .yardstick__tick {
   stroke: var(--rule);
-  stroke-width: 1;
 }
 
 .yardstick__tick--major {
-  stroke: var(--ink-soft);
-  stroke-width: 1.25;
+  stroke: var(--ink-2);
+}
+
+.yardstick__label,
+.yardstick__axis-unit {
+  font-family: var(--figures);
+  fill: var(--ink-3);
+  font-size: 14px;
 }
 
 .yardstick__label {
-  fill: var(--ink-soft);
-  font-family: var(--figures);
-  font-size: 15px;
   text-anchor: middle;
 }
 
 .yardstick__axis-unit {
-  fill: var(--ink-faint);
-  font-family: var(--figures);
-  font-size: 13px;
   text-anchor: end;
-  letter-spacing: 0.08em;
+  font-size: 12px;
 }
 
 .yardstick__span {
-  fill: var(--stamp);
-  opacity: 0.1;
-  transition: x 480ms cubic-bezier(0.16, 1, 0.3, 1), width 480ms cubic-bezier(0.16, 1, 0.3, 1);
+  fill: var(--claim);
+  opacity: 0.09;
+  transition: x 520ms cubic-bezier(0.16, 1, 0.3, 1), width 520ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* The needle is the only thing on the page that moves on its own, and it
+   moves because a value changed. */
 .yardstick__needle {
-  transition: transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .yardstick__needle path {
@@ -290,33 +271,121 @@ body {
 
 .yardstick__needle--ghost path {
   fill: none;
-  stroke: var(--stamp);
+  stroke: var(--claim);
   stroke-width: 1.5;
   stroke-dasharray: 3 3;
 }
 
 .yardstick__needle--ghost line {
-  stroke: var(--stamp);
+  stroke: var(--claim);
   stroke-width: 1.5;
   stroke-dasharray: 3 4;
 }
 
 .yardstick__needle-label {
-  fill: var(--stamp);
+  fill: var(--claim);
   font-family: var(--figures);
-  font-size: 13px;
+  font-size: 12.5px;
   text-anchor: middle;
-  letter-spacing: 0.04em;
 }
 
 .yardstick__caption {
-  max-width: 74ch;
-  margin: calc(var(--space) * 1.5) 0 0;
-  font-size: 15px;
-  color: var(--ink-soft);
+  max-width: var(--measure);
+  margin: calc(var(--space) * 3) 0 0;
+  font-size: var(--t-small);
+  color: var(--ink-2);
 }
 
-/* ------------------------------------------------------------ quote slip */
+/* ---------------------------------------------------------------- chips */
+
+.roster {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: calc(var(--space) * 3);
+}
+
+.chip {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 11px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: var(--t-small);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.chip:hover {
+  border-color: var(--ink-2);
+  color: var(--ink);
+}
+
+.chip--on {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.chip__rate {
+  font-size: var(--t-fine);
+}
+
+/* --------------------------------------------------------------- panels */
+
+.panel {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: calc(var(--space) * 3);
+}
+
+.panel__title {
+  font-size: var(--t-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 calc(var(--space) * 2);
+}
+
+.panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--space) * 2);
+  flex-wrap: wrap;
+  margin-bottom: calc(var(--space) * 2);
+}
+
+.panel__head .panel__title {
+  margin-bottom: 0;
+}
+
+.grid {
+  display: grid;
+  gap: calc(var(--space) * 3);
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: start;
+  margin-bottom: calc(var(--space) * 3);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.muted {
+  color: var(--ink-3);
+  font-size: var(--t-fine);
+  max-width: var(--measure);
+  margin: calc(var(--space) * 2) 0 0;
+}
+
+/* ------------------------------------------------------------ the slip */
 
 .field {
   display: block;
@@ -325,8 +394,8 @@ body {
 
 .field > span:first-child {
   display: block;
-  font-size: 13px;
-  color: var(--ink-soft);
+  font-size: var(--t-small);
+  color: var(--ink-2);
   margin-bottom: 6px;
 }
 
@@ -345,8 +414,8 @@ body {
 .field__row em {
   font-family: var(--figures);
   font-style: normal;
-  font-size: 13px;
-  color: var(--ink-faint);
+  font-size: var(--t-fine);
+  color: var(--ink-3);
 }
 
 input[type="text"],
@@ -354,19 +423,18 @@ input[type="url"],
 textarea {
   width: 100%;
   padding: 9px 11px;
-  background: var(--ledger);
+  background: var(--ground);
   border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  font-family: var(--figures);
-  font-size: 14px;
+  border-radius: 2px;
+  font-size: var(--t-small);
   color: var(--ink);
-  resize: vertical;
 }
 
 textarea {
   font-family: var(--display);
-  font-size: 15px;
+  font-size: var(--t-body);
   line-height: 1.5;
+  resize: vertical;
 }
 
 input[type="range"] {
@@ -375,14 +443,13 @@ input[type="range"] {
 }
 
 :focus-visible {
-  outline: 2px solid var(--stamp);
+  outline: 2px solid var(--claim);
   outline-offset: 2px;
 }
 
 .quote {
   border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--rule);
-  padding: calc(var(--space) * 1.5) 0;
+  padding-top: calc(var(--space) * 1.5);
   margin-bottom: calc(var(--space) * 2);
 }
 
@@ -399,15 +466,13 @@ input[type="range"] {
 
 .quote__label {
   flex: 1 1 auto;
-  font-size: 13px;
-  color: var(--ink-soft);
+  font-size: var(--t-small);
+  color: var(--ink-2);
 }
 
 .quote__value {
-  font-family: var(--figures);
-  font-size: 26px;
+  font-size: 27px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
 
@@ -417,10 +482,8 @@ input[type="range"] {
 }
 
 .quote__bps {
-  font-family: var(--figures);
-  font-size: 13px;
-  color: var(--ink-soft);
-  font-variant-numeric: tabular-nums;
+  font-size: var(--t-fine);
+  color: var(--ink-2);
   min-width: 6ch;
   text-align: right;
 }
@@ -428,61 +491,61 @@ input[type="range"] {
 .breakdown {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--t-small);
 }
 
 .breakdown caption {
   text-align: left;
-  font-family: var(--figures);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--ink-faint);
-  padding-bottom: 6px;
+  font-size: var(--t-small);
+  color: var(--ink-2);
+  padding-bottom: 8px;
 }
 
 .breakdown th {
   text-align: left;
   font-weight: 400;
-  color: var(--ink-soft);
+  color: var(--ink-2);
   padding: 5px 0;
 }
 
 .breakdown td {
   padding: 5px 0 5px 10px;
-  color: var(--ink-faint);
+  color: var(--ink-3);
+  font-size: var(--t-fine);
 }
 
 .breakdown td:first-of-type {
-  font-family: var(--figures);
-  font-variant-numeric: tabular-nums;
   color: var(--ink);
   text-align: right;
   white-space: nowrap;
+  font-size: var(--t-small);
 }
 
 .breakdown tr + tr th,
 .breakdown tr + tr td {
-  border-top: 1px solid var(--rule-soft);
+  border-top: 1px solid var(--rule-2);
 }
 
 .verdict {
   margin: calc(var(--space) * 2) 0 calc(var(--space) * 1.5);
   padding-left: 10px;
   border-left: 2px solid var(--rule);
-  font-size: 14px;
-  color: var(--ink-soft);
+  font-size: var(--t-small);
+  color: var(--ink-2);
+  max-width: var(--measure);
 }
 
 .verdict[data-tone="ok"] {
-  border-color: var(--bind);
+  border-color: var(--clean);
 }
+
 .verdict[data-tone="warn"] {
-  border-color: var(--amber);
+  border-color: var(--claim);
 }
+
 .verdict[data-tone="bad"] {
-  border-color: var(--stamp);
-  color: var(--stamp);
+  border-color: var(--claim);
+  color: var(--claim);
 }
 
 .button {
@@ -491,9 +554,9 @@ input[type="range"] {
   background: var(--ink);
   color: var(--paper);
   border: 1px solid var(--ink);
-  border-radius: var(--radius);
+  border-radius: 2px;
   font-family: inherit;
-  font-size: 15px;
+  font-size: var(--t-small);
   cursor: pointer;
   transition: background 120ms ease;
 }
@@ -504,7 +567,7 @@ input[type="range"] {
 
 .button:disabled {
   background: transparent;
-  color: var(--ink-faint);
+  color: var(--ink-3);
   border-color: var(--rule);
   cursor: not-allowed;
 }
@@ -515,14 +578,14 @@ input[type="range"] {
 
 .button--quiet {
   background: transparent;
-  color: var(--ink-soft);
+  color: var(--ink-2);
   border-color: var(--rule);
 }
 
-/* ------------------------------------------------------------------ book */
+/* ------------------------------------------------------------- the book */
 
 .book {
-  height: 470px;
+  height: 452px;
   overflow-y: auto;
   position: relative;
   border-top: 1px solid var(--ink);
@@ -542,19 +605,18 @@ input[type="range"] {
   gap: calc(var(--space) * 1.5);
   height: 56px;
   padding: 0 4px;
-  border-bottom: 1px solid var(--rule-soft);
+  border-bottom: 1px solid var(--rule-2);
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--t-small);
 }
 
 .bond:hover {
-  background: var(--ledger);
+  background: var(--ground);
 }
 
 .bond__id {
-  font-family: var(--figures);
-  font-size: 12px;
-  color: var(--ink-faint);
+  font-size: var(--t-fine);
+  color: var(--ink-3);
 }
 
 .bond__party {
@@ -564,13 +626,12 @@ input[type="range"] {
 }
 
 .bond__obligor {
-  font-family: var(--figures);
-  font-size: 12px;
+  font-size: var(--t-fine);
 }
 
 .bond__criteria {
-  color: var(--ink-faint);
-  font-size: 12px;
+  color: var(--ink-3);
+  font-size: var(--t-fine);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -581,8 +642,6 @@ input[type="range"] {
 .bond__state {
   display: flex;
   flex-direction: column;
-  font-family: var(--figures);
-  font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
@@ -592,26 +651,26 @@ input[type="range"] {
   font-family: var(--display);
   font-style: normal;
   font-size: 11px;
-  color: var(--ink-faint);
+  color: var(--ink-3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .bond__state {
-  text-transform: uppercase;
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: var(--t-fine);
 }
 
 .bond--honored .bond__state {
-  color: var(--bind);
+  color: var(--clean);
 }
+
 .bond--breached .bond__state {
-  color: var(--stamp);
+  color: var(--claim);
 }
+
 .bond--disputed .bond__state {
-  color: var(--amber);
+  color: var(--ink-2);
 }
 
 @media (max-width: 620px) {
@@ -623,12 +682,12 @@ input[type="range"] {
   }
 }
 
-/* --------------------------------------------------------------- console */
+/* -------------------------------------------------------------- console */
 
 .stats {
   display: flex;
   flex-wrap: wrap;
-  gap: calc(var(--space) * 2);
+  gap: calc(var(--space) * 2.5);
   margin: 0;
 }
 
@@ -638,29 +697,25 @@ input[type="range"] {
 }
 
 .stats dt {
-  font-size: 11px;
-  color: var(--ink-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-size: var(--t-fine);
+  color: var(--ink-3);
 }
 
 .stats dd {
   margin: 0;
-  font-family: var(--figures);
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
+  font-size: var(--t-small);
 }
 
 .stats dd[data-tone="ok"] {
-  color: var(--bind);
+  color: var(--clean);
 }
+
 .stats dd[data-tone="bad"] {
-  color: var(--stamp);
+  color: var(--claim);
 }
 
 .stats--risk {
-  margin-top: calc(var(--space) * 2);
-  gap: calc(var(--space) * 3);
+  margin-top: calc(var(--space) * 2.5);
 }
 
 .hist {
@@ -676,47 +731,47 @@ input[type="range"] {
   flex: 1 1 0;
   min-height: 1px;
   background: var(--ink);
-  opacity: 0.82;
+  opacity: 0.8;
 }
 
 .hist__bar:hover {
-  background: var(--stamp);
+  background: var(--claim);
   opacity: 1;
 }
 
-/* ---------------------------------------------------------------- notice */
+/* --------------------------------------------------------------- notice */
 
 .notice {
   margin: 0 0 calc(var(--space) * 3);
   padding: 10px 14px;
   border-left: 3px solid var(--ink);
   background: var(--paper);
-  font-size: 14px;
+  font-size: var(--t-small);
+  max-width: var(--measure);
 }
 
 .notice[data-tone="ok"] {
-  border-color: var(--bind);
-}
-.notice[data-tone="warn"] {
-  border-color: var(--amber);
-}
-.notice[data-tone="bad"] {
-  border-color: var(--stamp);
+  border-color: var(--clean);
 }
 
-/* ---------------------------------------------------------------- dialog */
+.notice[data-tone="warn"],
+.notice[data-tone="bad"] {
+  border-color: var(--claim);
+}
+
+/* --------------------------------------------------------------- dialog */
 
 .dialog {
   width: min(560px, calc(100vw - 32px));
   padding: 0;
   border: 1px solid var(--ink);
-  border-radius: var(--radius);
+  border-radius: 2px;
   background: var(--paper);
   color: var(--ink);
 }
 
 .dialog::backdrop {
-  background: rgba(19, 26, 31, 0.4);
+  background: rgba(18, 24, 28, 0.42);
 }
 
 .sheet {
@@ -730,39 +785,42 @@ input[type="range"] {
   margin-bottom: calc(var(--space) * 2);
 }
 
+.sheet__bond {
+  font-family: var(--figures);
+  font-size: var(--t-small);
+  color: var(--ink-2);
+}
+
+/* A settled bond gets stamped, the way a slip does. */
 .stamp {
   font-family: var(--figures);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
+  font-size: var(--t-fine);
   padding: 4px 10px;
   border: 2px solid currentColor;
   border-radius: 2px;
   transform: rotate(-3deg);
-  color: var(--ink-soft);
+  color: var(--ink-2);
 }
 
 .stamp--honored {
-  color: var(--bind);
+  color: var(--clean);
 }
+
 .stamp--breached {
-  color: var(--stamp);
-}
-.stamp--disputed {
-  color: var(--amber);
+  color: var(--claim);
 }
 
 .sheet__criteria {
   margin: 0 0 calc(var(--space) * 2);
   padding: calc(var(--space) * 1.5);
-  background: var(--ledger);
+  background: var(--ground);
   border-left: 2px solid var(--rule);
-  font-size: 14px;
+  font-size: var(--t-small);
 }
 
 .sheet__verdict {
-  font-size: 14px;
-  color: var(--ink-soft);
+  font-size: var(--t-small);
+  color: var(--ink-2);
 }
 
 .sheet__foot {
@@ -781,46 +839,4 @@ input[type="range"] {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* ------------------------------------------------------------- wallet */
-
-.masthead__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space);
-}
-
-.wallet {
-  font-family: var(--figures);
-  font-size: 11px;
-  text-transform: lowercase;
-  letter-spacing: 0.08em;
-  padding: 5px 11px;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--ink-soft);
-  cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease;
-}
-
-.wallet:hover:not(:disabled) {
-  border-color: var(--ink);
-  color: var(--ink);
-}
-
-.wallet:disabled {
-  cursor: not-allowed;
-  color: var(--ink-faint);
-}
-
-.wallet[data-tone="ok"] {
-  border-color: var(--bind);
-  color: var(--bind);
-}
-
-.wallet[data-tone="warn"] {
-  border-color: var(--amber);
-  color: var(--amber);
 }

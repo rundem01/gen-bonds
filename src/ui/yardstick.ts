@@ -15,8 +15,8 @@ import { PREMIUM_CAP_BPS } from "../core/pricing.ts";
 
 const TICKS = [25, 100, 250, 500, 1000, 2000, 3500, 5000];
 const W = 1000;
-const H = 168;
-const PAD = 40;
+const H = 190;
+const PAD = 44;
 
 /** Square-root scale: cheap risk is where the resolution is needed. */
 function x(bps: number): number {
@@ -58,7 +58,7 @@ export class Yardstick {
       return el;
     };
 
-    const baseline = H - 58;
+    const baseline = H - 64;
 
     // The shaded span between today's price and the post-breach price.
     this.#span = make("rect", {

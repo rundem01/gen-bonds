@@ -428,7 +428,7 @@ function openBond(store: Store<AppState>, bond: Bond): void {
   dialog.innerHTML = `
     <form method="dialog" class="sheet">
       <header class="sheet__head">
-        <span class="eyebrow">Bond ${String(bond.id).padStart(4, "0")}</span>
+        <span class="sheet__bond">Bond ${String(bond.id).padStart(4, "0")}</span>
         <span class="stamp stamp--${bond.state}">${bond.state}</span>
       </header>
       <p class="sheet__criteria">${bond.criteria}</p>
@@ -504,16 +504,13 @@ function template(): string {
   <p class="notice" data-notice hidden></p>
 
   <section class="panel panel--instrument">
-    <div class="panel__head">
-      <h2 class="eyebrow">The yardstick</h2>
-      <div class="roster" data-roster></div>
-    </div>
     <div data-yardstick></div>
+    <div class="roster" data-roster></div>
   </section>
 
   <div class="grid">
     <section class="panel panel--slip">
-      <h2 class="eyebrow">Quote slip</h2>
+      <h2 class="panel__title">Price a job</h2>
 
       <label class="field">
         <span>Face value the principal is protected for</span>
@@ -565,7 +562,7 @@ function template(): string {
 
     <section class="panel panel--book">
       <div class="panel__head">
-        <h2 class="eyebrow">The book</h2>
+        <h2 class="panel__title">The book</h2>
         <dl class="stats stats--inline">
           <div><dt>Capital</dt><dd data-out="capital">—</dd></div>
           <div><dt>Free</dt><dd data-out="free">—</dd></div>
@@ -580,7 +577,7 @@ function template(): string {
   </div>
 
   <section class="panel panel--console">
-    <h2 class="eyebrow">What a bad day costs</h2>
+    <h2 class="panel__title">What a bad day costs</h2>
     <div data-risk></div>
   </section>
 

@@ -20,7 +20,7 @@ Then the task happens. Deliver, and the pool keeps the premium — B's collatera
 
 **Why now:** agents are already transacting with real balances — hiring each other, paying each other, spending on behalf of people who aren't watching every transaction. What's missing isn't a better way to assert who's trustworthy. It's a mechanism that makes a broken promise cost something. Insurance is that mechanism. It's never been available to software before, because pricing one required a human underwriter reading a contract, and adjudicating one required a human reading the delivered work. Both are machine-executable now.
 
-This isn't a deck. It's a deployed GenLayer Intelligent Contract, live on Studio Next, and the full lifecycle — fund, bind, deliver, adjudicate, settle, reprice — has been executed end to end. Difficulty pricing at bind ran through multi-validator consensus across three independently-run models: Gemini, a GPT-based policy, and Claude Sonnet 4.6, each computing its own answer before checking whether the others agreed.
+This isn't a deck. It's a deployed GenLayer Intelligent Contract, live on Studionet, and the full lifecycle — fund, bind, deliver, adjudicate, settle, reprice — has been executed end to end. Difficulty pricing at bind ran through multi-validator consensus across three independently-run models: Gemini, a GPT-based policy, and Claude Sonnet 4.6, each computing its own answer before checking whether the others agreed.
 
 Settlement transaction: `0x86bdd8fac4522de540f1b8a24a751fb40ccbc97b5c804125a31a96d9ed310593`
 
@@ -31,6 +31,6 @@ The premium is the reputation. Nothing here asserts an agent is reliable. The ma
 ---
 
 **Try it:** https://gen-bonds-real.vercel.app — no wallet, no signup
-**Live contract:** `<address>` on GenLayer Studio Next
+**Live contract:** `<address>` on GenLayer Studio Next (chain 61997)
 **Settlement tx:** `0x86bdd8fac4522de540f1b8a24a751fb40ccbc97b5c804125a31a96d9ed310593`
 **Code:** `github.com/<your handle>/genbonds`
